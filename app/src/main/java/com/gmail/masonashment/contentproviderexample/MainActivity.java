@@ -15,7 +15,11 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -43,6 +47,18 @@ public class MainActivity extends AppCompatActivity {
                         null,
                         null,
                         ContactsContract.Contacts.DISPLAY_NAME_PRIMARY);
+                if (cursor != null) {
+                    List<String> contacts = new ArrayList<String>();
+                    while (cursor.moveToNext()) {
+                        contacts.add(cursor.getString(cursor.getColumnIndex(
+                                ContactsContract.Contacts.DISPLAY_NAME_PRIMARY)));
+                    }
+                    cursor.close();
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this,
+                            R.layout.contact_detail, R.id.name, contacts);
+                    contactNames.setAdapter(adapter);
+                }
+                Log.d(TAG, "fab onClick: ends");
             }
         });
     }
