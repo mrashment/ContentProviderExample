@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private ListView contactNames;
     private static final int REQUEST_CODE_READ_CONTACTS = 1;
     private static boolean READ_CONTACTS_GRANTED = false;
+    FloatingActionButton fab = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         int hasReadContactPermission = ContextCompat.checkSelfPermission(this, READ_CONTACTS);
         Log.d(TAG, "onCreate: checkSelfPermission = " + hasReadContactPermission);
 
-        if(hasReadContactPermission == PackageManager.PERMISSION_GRANTED) {
+        if (hasReadContactPermission == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "onCreate: permission granted");
             READ_CONTACTS_GRANTED = true;
         } else {
@@ -55,28 +56,33 @@ public class MainActivity extends AppCompatActivity {
                     REQUEST_CODE_READ_CONTACTS);
         }
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "fab onClick: starts");
-                String[] projection = {ContactsContract.Contacts.DISPLAY_NAME_PRIMARY};
-                ContentResolver contentResolver = getContentResolver();
-                Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI,
-                        projection,
-                        null,
-                        null,
-                        ContactsContract.Contacts.DISPLAY_NAME_PRIMARY);
-                if (cursor != null) {
-                    List<String> contacts = new ArrayList<String>();
-                    while (cursor.moveToNext()) {
-                        contacts.add(cursor.getString(cursor.getColumnIndex(
-                                ContactsContract.Contacts.DISPLAY_NAME_PRIMARY)));
+                if (READ_CONTACTS_GRANTED) {
+                    String[] projection = {ContactsContract.Contacts.DISPLAY_NAME_PRIMARY};
+                    ContentResolver contentResolver = getContentResolver();
+                    Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI,
+                            projection,
+                            null,
+                            null,
+                            ContactsContract.Contacts.DISPLAY_NAME_PRIMARY);
+                    if (cursor != null) {
+                        List<String> contacts = new ArrayList<String>();
+                        while (cursor.moveToNext()) {
+                            contacts.add(cursor.getString(cursor.getColumnIndex(
+                                    ContactsContract.Contacts.DISPLAY_NAME_PRIMARY)));
+                        }
+                        cursor.close();
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this,
+                                R.layout.contact_detail, R.id.name, contacts);
+                        contactNames.setAdapter(adapter);
                     }
-                    cursor.close();
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this,
-                            R.layout.contact_detail, R.id.name, contacts);
-                    contactNames.setAdapter(adapter);
+                } else {
+                    Snackbar.make(view, "Please grant access to your Contacts", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
                 }
                 Log.d(TAG, "fab onClick: ends");
             }
@@ -87,10 +93,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         Log.d(TAG, "onRequestPermissionsResult: start");
-        switch(requestCode) {
+        switch (requestCode) {
             case REQUEST_CODE_READ_CONTACTS:
                 //if request is cancelled, the result arrays are empty
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts related task you need to do
                     Log.d(TAG, "onRequestPermissionsResult: permission granted");
@@ -100,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
                     // functionality that depends on this permission
                     Log.d(TAG, "onRequestPermissionsResult: permission denied");
                 }
+//                fab.setEnabled(READ_CONTACTS_GRANTED);
         }
         Log.d(TAG, "onRequestPermissionsResult: ends");
     }
