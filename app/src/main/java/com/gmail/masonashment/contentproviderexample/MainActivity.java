@@ -1,14 +1,19 @@
 package com.gmail.masonashment.contentproviderexample;
 
+import android.Manifest;
 import android.content.ContentResolver;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -21,10 +26,13 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.Manifest.permission.READ_CONTACTS;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private ListView contactNames;
-
+    private static final int REQUEST_CODE_READ_CONTACTS = 1;
+    private static boolean READ_CONTACTS_GRANTED = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +42,18 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         contactNames = findViewById(R.id.contact_names);
+
+        int hasReadContactPermission = ContextCompat.checkSelfPermission(this, READ_CONTACTS);
+        Log.d(TAG, "onCreate: checkSelfPermission = " + hasReadContactPermission);
+
+        if(hasReadContactPermission == PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "onCreate: permission granted");
+            READ_CONTACTS_GRANTED = true;
+        } else {
+            Log.d(TAG, "onCreate: requesting permission");
+            ActivityCompat.requestPermissions(this, new String[]{READ_CONTACTS},
+                    REQUEST_CODE_READ_CONTACTS);
+        }
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -61,6 +81,27 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "fab onClick: ends");
             }
         });
+        Log.d(TAG, "onCreate: ends");
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionsResult: start");
+        switch(requestCode) {
+            case REQUEST_CODE_READ_CONTACTS:
+                //if request is cancelled, the result arrays are empty
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // contacts related task you need to do
+                    Log.d(TAG, "onRequestPermissionsResult: permission granted");
+                    READ_CONTACTS_GRANTED = true;
+                } else {
+                    //permission denied, boo! Disable the
+                    // functionality that depends on this permission
+                    Log.d(TAG, "onRequestPermissionsResult: permission denied");
+                }
+        }
+        Log.d(TAG, "onRequestPermissionsResult: ends");
     }
 
     @Override
