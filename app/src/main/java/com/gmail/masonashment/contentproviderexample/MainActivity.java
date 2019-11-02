@@ -51,13 +51,17 @@ public class MainActivity extends AppCompatActivity {
         int hasReadContactPermission = ContextCompat.checkSelfPermission(this, READ_CONTACTS);
         Log.d(TAG, "onCreate: checkSelfPermission = " + hasReadContactPermission);
 
-        if (hasReadContactPermission == PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG, "onCreate: permission granted");
-//            READ_CONTACTS_GRANTED = true;
-        } else {
-            Log.d(TAG, "onCreate: requesting permission");
-            ActivityCompat.requestPermissions(this, new String[]{READ_CONTACTS},
-                    REQUEST_CODE_READ_CONTACTS);
+//        if (hasReadContactPermission == PackageManager.PERMISSION_GRANTED) {
+//            Log.d(TAG, "onCreate: permission granted");
+////            READ_CONTACTS_GRANTED = true;
+//        } else {
+//            Log.d(TAG, "onCreate: requesting permission");
+//            ActivityCompat.requestPermissions(this, new String[]{READ_CONTACTS},
+//                    REQUEST_CODE_READ_CONTACTS);
+//        }
+        if (hasReadContactPermission != PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "onCreate: requesting permissions");
+            ActivityCompat.requestPermissions(this,new String[] {READ_CONTACTS}, REQUEST_CODE_READ_CONTACTS);
         }
 
         fab = findViewById(R.id.fab);
@@ -117,26 +121,26 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate: ends");
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Log.d(TAG, "onRequestPermissionsResult: start");
-        switch (requestCode) {
-            case REQUEST_CODE_READ_CONTACTS:
-                //if request is cancelled, the result arrays are empty
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // contacts related task you need to do
-                    Log.d(TAG, "onRequestPermissionsResult: permission granted");
-//                    READ_CONTACTS_GRANTED = true;
-                } else {
-                    //permission denied, boo! Disable the
-                    // functionality that depends on this permission
-                    Log.d(TAG, "onRequestPermissionsResult: permission denied");
-                }
-//                fab.setEnabled(READ_CONTACTS_GRANTED);
-        }
-        Log.d(TAG, "onRequestPermissionsResult: ends");
-    }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        Log.d(TAG, "onRequestPermissionsResult: start");
+//        switch (requestCode) {
+//            case REQUEST_CODE_READ_CONTACTS:
+//                //if request is cancelled, the result arrays are empty
+//                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    // permission was granted, yay! Do the
+//                    // contacts related task you need to do
+//                    Log.d(TAG, "onRequestPermissionsResult: permission granted");
+////                    READ_CONTACTS_GRANTED = true;
+//                } else {
+//                    //permission denied, boo! Disable the
+//                    // functionality that depends on this permission
+//                    Log.d(TAG, "onRequestPermissionsResult: permission denied");
+//                }
+////                fab.setEnabled(READ_CONTACTS_GRANTED);
+//        }
+//        Log.d(TAG, "onRequestPermissionsResult: ends");
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
